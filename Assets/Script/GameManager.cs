@@ -12,6 +12,13 @@ public class GameManager : MonoBehaviour
     [Header("UI")]
     public GameObject CompleteLevelUI;
 
+    [Header("restartLevel")]
+    public GameObject RestartBatton;
+
+    [Header("Fail State")]
+    public bool isPlayerFallen = false;
+
+
     private void Awake()
     {
         if (instance == null)
@@ -25,13 +32,30 @@ public class GameManager : MonoBehaviour
         if (isProgramFinished && isPlayerAtGoal)
         {
             CompleteLevelUI.SetActive(true);
+            RestartBatton.SetActive(false);
+
         }
     }
 
     public void RestartLevel()
     {
+        isPlayerFallen = false;
         isProgramFinished = false;
         isPlayerAtGoal = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void PlayerFall()
+    {
+        if (isPlayerFallen) return;
+
+        isPlayerFallen = true;
+    }
+
+    public void ResetData()
+    {
+        isPlayerFallen = false;
+        isProgramFinished = false;
+        isPlayerAtGoal = false;
     }
 }

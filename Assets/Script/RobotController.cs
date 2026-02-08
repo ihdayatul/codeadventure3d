@@ -9,6 +9,13 @@ public class RobotController : MonoBehaviour
     public float rotationSpeed = 120f;
     public float moveDistance = 1f; // Jarak per gerakan
 
+    [Header("Falling Settings")]
+    public float fallSpeed = 5f; // Kecepatan jatuh
+    public float fallDistance = 10f; // Jarak jatuh maksimum
+    public LayerMask groundLayer; // Layer untuk tile/dasar
+    public float groundCheckOffset = 0.1f; // Offset untuk raycast
+    public float groundCheckDistance = 0.2f; // Jarak pengecekan ground
+
     [Header("Animation")]
     public Animator animator;
 
@@ -16,33 +23,47 @@ public class RobotController : MonoBehaviour
     private Queue<string> commandQueue = new Queue<string>();
     private bool isExecuting = false;
 
+    private Vector3 startPosition;
+
     void Start()
     {
-        // Cari animator jika belum diassign
-        if (animator == null)
-            animator = GetComponent<Animator>();
+        startPosition = transform.position;
     }
 
-   
-    public void MoveForward()
+    public void Restart()
     {
-        commandQueue.Enqueue("MOVE");
+        transform.position = startPosition;
+        transform.rotation = Quaternion.identity;
+    }
+   
+    public IEnumerator MoveForward()
+    {
+         commandQueue.Enqueue("MOVE");
         if (!isExecuting)
-            StartCoroutine(ProcessCommands());
+            yield return StartCoroutine(ProcessCommands());
     }
 
-    public void RotateLeft()
+
+
+    public IEnumerator RotateLeft()
     {
         commandQueue.Enqueue("ROTATE_LEFT");
         if (!isExecuting)
-            StartCoroutine(ProcessCommands());
+           yield return StartCoroutine(ProcessCommands());
     }
 
-    public void RotateRight()
+    public IEnumerator RotateRight()
     {
         commandQueue.Enqueue("ROTATE_RIGHT");
         if (!isExecuting)
-            StartCoroutine(ProcessCommands());
+            yield return StartCoroutine(ProcessCommands());
+    }
+
+    public IEnumerator Stop()
+    {
+        commandQueue.Enqueue("STOP");
+        if (!isExecuting)
+            yield return StartCoroutine(ProcessCommands());
     }
 
     IEnumerator ProcessCommands()
@@ -65,6 +86,10 @@ public class RobotController : MonoBehaviour
 
                 case "ROTATE_RIGHT":
                     yield return StartCoroutine(RotateBy(90f));
+                    break;
+
+                case "STOP":
+                    yield return StartCoroutine(StopMove());
                     break;
             }
 
@@ -103,15 +128,14 @@ public class RobotController : MonoBehaviour
         // Pastikan posisi tepat
         transform.position = targetPos;
 
-        // Stop animasi
-        if (animator != null)
-            animator.SetBool("IsWalking", false);
-
         Debug.Log($"Moved to: {transform.position}");
     }
 
     IEnumerator RotateBy(float angle)
     {
+        if (animator != null)
+            animator.SetBool("IsWalking", false);
+
         Quaternion startRot = transform.rotation;
         Quaternion targetRot = Quaternion.Euler(0, startRot.eulerAngles.y + angle, 0);
 
@@ -130,6 +154,14 @@ public class RobotController : MonoBehaviour
 
         transform.rotation = targetRot;
         Debug.Log($"Rotated to: {transform.eulerAngles.y}°");
+    }
+
+    IEnumerator StopMove()
+    {
+        if (animator != null)
+            animator.SetBool("IsWalking", false);
+
+        yield return null;
     }
 
     public void ClearCommands()

@@ -1,23 +1,28 @@
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class ProgrammingArea : MonoBehaviour, IDropHandler
 {
     [Header("References")]
     public RobotController robot;
     public Transform codeBlocksPanel;
+    public Transform codeBlockContainer;
 
     [Header("Settings")]
     public List<CodeBlock> codeBlocks = new List<CodeBlock>();
-    public float executionDelay = 0.5f;
     public int maxBlocks = 10;
 
     [Header("Visual")]
     public Color validDropColor = new Color(0, 1, 0, 0.3f);
     public Color invalidDropColor = new Color(1, 0, 0, 0.3f);
+
+    [Header("UI")]
+    public Button runButton;
+    public Button restartButton;
 
     // HAPUS baris-baris berikut (event tidak digunakan):
     // public delegate void ProgramComplete();
@@ -30,6 +35,9 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
     void Start()
     {
         areaImage = GetComponent<Image>();
+
+        runButton.enabled = false;
+        runButton.gameObject.SetActive(true);
 
         if (codeBlocksPanel == null)
         {
@@ -66,18 +74,29 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
             if (!codeBlocks.Contains(codeBlock))
             {
                 codeBlocks.Add(codeBlock);
-                codeBlock.transform.SetParent(transform);
+                codeBlock.transform.SetParent(codeBlockContainer);
 
                 // Reset posisi
                 RectTransform rt = codeBlock.GetComponent<RectTransform>();
                 rt.anchoredPosition = Vector2.zero;
                 rt.sizeDelta = new Vector2(150, 80);
 
-                Debug.Log($"Blok ditambahkan: {codeBlock.blockType} (Total: {codeBlocks.Count})");
+                //Debug.Log($"Blok ditambahkan: {codeBlock.blockType} (Total: {codeBlocks.Count})");
+
+                runButton.enabled = codeBlocks.Count > 0;
 
                 StartCoroutine(ShowValidDropFeedback());
             }
         }
+    }
+    
+    public void RestartCharacter()
+    {
+        restartButton.gameObject.SetActive(false);
+        runButton.gameObject.SetActive(true);
+        runButton.enabled = codeBlocks.Count > 0;
+        robot.Restart();
+        GameManager.instance.ResetData();
     }
 
     public void ExecuteProgram()
@@ -87,6 +106,10 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
 
         if (robot == null || codeBlocks.Count == 0)
             return;
+        //if (GameManager.instance.isPlayerFallen)
+           // return;
+
+        runButton.enabled = false;
 
         StartCoroutine(ExecuteProgramCoroutine());
     }
@@ -97,41 +120,52 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
 
         foreach (CodeBlock block in codeBlocks)
         {
-            ExecuteBlockCommand(block);
-            yield return new WaitForSeconds(executionDelay);
+            yield return StartCoroutine(ExecuteBlockCommandCoroutine(block));
+           // STOP TOTAL JIKA JATUH
+        if (GameManager.instance.isPlayerFallen)
+            {
+                Debug.Log("Eksekusi dihentikan: Player jatuh");
+                isExecuting = false;
+                break;
+            }
         }
 
+        yield return StartCoroutine(robot.Stop());
+
         isExecuting = false;
+
+        ShowRestartButton(true);
 
         // PROGRAM SELESAI DI SINI (BUKAN DI AWAL)
         GameManager.instance.isProgramFinished = true;
         GameManager.instance.CheckWinCondition();
     }
 
-
-    private void ExecuteBlockCommand(CodeBlock block)
+    private void ShowRestartButton(bool show)
     {
+        runButton.gameObject.SetActive(!show);
+        restartButton.gameObject.SetActive(show);
+    }
+
+
+    private IEnumerator ExecuteBlockCommandCoroutine(CodeBlock block)
+    {
+
         switch (block.blockType.ToLower())
         {
             case "move":
-            case "forward":
-            case "maju":
                 Debug.Log("Eksekusi: MoveForward");
-                robot.MoveForward();
+                yield return StartCoroutine(robot.MoveForward());
                 break;
 
-            case "turn_left":
             case "rotate_left":
-            case "kiri":
                 Debug.Log("Eksekusi: RotateLeft");
-                robot.RotateLeft();
+                yield return StartCoroutine(robot.RotateLeft());
                 break;
 
-            case "turn_right":
             case "rotate_right":
-            case "kanan":
                 Debug.Log("Eksekusi: RotateRight");
-                robot.RotateRight();
+                yield return StartCoroutine(robot.RotateRight());
                 break;
         }
     }
