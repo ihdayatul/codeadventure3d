@@ -16,8 +16,17 @@ public class RobotController : MonoBehaviour
     public float groundCheckOffset = 0.1f; // Offset untuk raycast
     public float groundCheckDistance = 0.2f; // Jarak pengecekan ground
 
+    
+
     [Header("Animation")]
     public Animator animator;
+
+    AudioManager audioManager;
+
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
     // Queue untuk menyimpan perintah
     private Queue<string> commandQueue = new Queue<string>();
@@ -77,6 +86,7 @@ public class RobotController : MonoBehaviour
             switch (command)
             {
                 case "MOVE":
+                    audioManager.PlaySFX(audioManager.Walk);
                     yield return StartCoroutine(MoveOneStep());
                     break;
 

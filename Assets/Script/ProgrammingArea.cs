@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
+using Unity.VisualScripting;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class ProgrammingArea : MonoBehaviour, IDropHandler
@@ -10,7 +12,7 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
     [Header("References")]
     public RobotController robot;
     public Transform codeBlocksPanel;
-    public Transform codeBlockContainer;
+    public RectTransform codeBlockContainer;
 
     [Header("Settings")]
     public List<CodeBlock> codeBlocks = new List<CodeBlock>();
@@ -31,6 +33,28 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
     private Dictionary<CodeBlock, Transform> blockOriginalParents = new Dictionary<CodeBlock, Transform>();
     private bool isExecuting = false;
     private Image areaImage;
+
+    public int BlocksCount
+    {
+        get
+        {
+            var count = codeBlocks.Count;
+            var loopBlocks = codeBlockContainer.GetComponentsInChildren<LoopBlock>();
+            foreach (var loop in loopBlocks)
+            {
+                count += loop.CodeBlocks.Count;
+            }
+            return count;
+        }
+    }
+
+    private void Update()
+    {
+        if (Mouse.current.middleButton.isPressed)
+        {
+            Debug.Log("block count: " + BlocksCount);
+        }
+    }
 
     void Start()
     {
@@ -55,6 +79,11 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
         CodeBlock codeBlock = dropped.GetComponent<CodeBlock>();
         if (codeBlock != null)
         {
+            if (codeBlocks.Contains(codeBlock))
+            {
+                return;
+            }
+
             // Cek batas maksimum
             if (codeBlocks.Count >= maxBlocks)
             {
@@ -75,6 +104,11 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
             {
                 codeBlocks.Add(codeBlock);
                 codeBlock.transform.SetParent(codeBlockContainer);
+                if (codeBlock.blockType == "loop")
+                {
+                    var loopBlock = codeBlock.GetComponent<LoopBlock>();
+                    loopBlock.SetAsCodeBlock();
+                }   
 
                 // Reset posisi
                 RectTransform rt = codeBlock.GetComponent<RectTransform>();
@@ -85,11 +119,18 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
 
                 runButton.enabled = codeBlocks.Count > 0;
 
+                RefreshList();
+
                 StartCoroutine(ShowValidDropFeedback());
             }
         }
     }
-    
+
+    public void RefreshList()
+    {
+        LayoutRebuilder.ForceRebuildLayoutImmediate(codeBlockContainer);
+    }
+
     public void RestartCharacter()
     {
         restartButton.gameObject.SetActive(false);
@@ -167,6 +208,19 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
                 Debug.Log("Eksekusi: RotateRight");
                 yield return StartCoroutine(robot.RotateRight());
                 break;
+
+            case "loop":
+                var loopBlock = block.GetComponent<LoopBlock>();
+                for (int i = 0; i < loopBlock.RepeatCount; i++)
+                {
+                    Debug.Log($"Eksekusi: Loop Iterasi {i + 1} dari {loopBlock.RepeatCount}");
+                    foreach (CodeBlock innerBlock in loopBlock.CodeBlocks)
+                    {
+                        yield return StartCoroutine(ExecuteBlockCommandCoroutine(innerBlock));
+                    }
+                }
+                break;
+
         }
     }
 
@@ -253,6 +307,37 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
             areaImage.color = invalidDropColor;
             yield return new WaitForSeconds(0.5f);
             areaImage.color = originalColor;
+        }
+    }
+
+    public void DoShowValidDropFeedback()
+    {
+        StartCoroutine(ShowValidDropFeedback());
+    }
+
+    public void DoShowInvalidDropFeedback()
+    {
+        StartCoroutine(ShowInvalidDropFeedback());
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        GameObject dragged = eventData.pointerDrag;
+        if (dragged == null) return;
+
+        CodeBlock codeBlock = dragged.GetComponent<CodeBlock>();
+        if (codeBlock == null) return;
+
+        if (codeBlocks.Contains(codeBlock))
+        {
+            codeBlocks.Clear();
+
+            foreach (Transform block in codeBlockContainer)
+            {
+                var existingBlock = block.GetComponent<CodeBlock>();
+                codeBlocks.Add(existingBlock);
+            }
+            return;
         }
     }
 }

@@ -75,6 +75,8 @@ public class CodeBlock : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
             
         }
 
+        blockImage.raycastTarget = false;
+
         // Simpan posisi asli
         parentBeforeDrag = transform.parent;
         positionBeforeDrag = rectTransform.anchoredPosition;
@@ -126,7 +128,7 @@ public class CodeBlock : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         {
             ReturnToOriginalPosition();
         }
-
+        blockImage.raycastTarget = true;
     }
 
     public void ReturnToOriginalPosition()
