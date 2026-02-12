@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
 
     public void RefreshList()
     {
-        programmingArea.RefreshList();
+        programmingArea.RefreshLayout(); // ✅ nama baru
     }
 
     public void ShowValidDropFeedback()

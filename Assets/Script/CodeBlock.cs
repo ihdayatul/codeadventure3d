@@ -4,16 +4,27 @@ using UnityEngine.UI;
 
 public class CodeBlock : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    // ============= ENUM JENIS BLOK =============
+    public enum BlockType
+    {
+        Move,
+        RotateLeft,
+        RotateRight,
+        Loop,
+        FunctionDefinition,  // Blok definisi fungsi (di panel FUNCTION)
+        FunctionCall         // Blok panggil fungsi (di panel PROGRAM)
+    }
+
     [Header("Block Configuration")]
-    public string blockType = "move";
+    public BlockType blockType = BlockType.Move;
     public string displayText = "Blok Kode";
 
     [Header("Template Reference")]
     [Tooltip("Referensi ke template asal blok ini")]
-    public CodeBlock originalTemplate; // Ganti dari private ke public
+    public CodeBlock originalTemplate;
 
     [Header("Block Settings")]
-    public bool isTemplate = false; // Apakah ini blok template di panel?
+    public bool isTemplate = false; // True jika di panel palette, false jika di program area
 
     // Private references
     private RectTransform rectTransform;
@@ -23,6 +34,7 @@ public class CodeBlock : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     private Transform parentBeforeDrag;
     private Vector2 positionBeforeDrag;
 
+    // ============= INITIALIZATION =============
     void Awake()
     {
         InitializeComponents();
@@ -34,75 +46,47 @@ public class CodeBlock : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         blockImage = GetComponent<Image>();
         uiText = GetComponentInChildren<Text>();
 
-        // Add CanvasGroup if not exist
+        // Pastikan CanvasGroup tersedia untuk mengontrol raycast saat drag
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
-        // Setup text
+        // Set teks awal
         if (uiText != null && !string.IsNullOrEmpty(displayText))
             uiText.text = displayText;
-
-        // Setup initial color
-
     }
 
+    // ============= DRAG & DROP HANDLERS =============
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // Jika ini adalah TEMPLATE (blok di panel asal), buat duplikat
+        // Jika ini adalah TEMPLATE (blok di panel palette), buat duplikat
         if (isTemplate)
         {
-            // Buat salinan baru dari prefab
-            GameObject newBlockObj = Instantiate(gameObject, transform.position, transform.rotation, transform.parent);
-            CodeBlock newBlock = newBlockObj.GetComponent<CodeBlock>();
-            newBlock.isTemplate = false; // Ini bukan template
-            newBlock.originalTemplate = this; // Simpan referensi ke template asal
-
-            // Copy semua komponen visual
-            Image originalImage = GetComponent<Image>();
-            Image newImage = newBlockObj.GetComponent<Image>();
-            if (originalImage != null && newImage != null)
-            {
-                newImage.sprite = originalImage.sprite;
-                newImage.color = originalImage.color;
-            }
-
-            // Pindahkan event drag ke duplikat
-            eventData.pointerDrag = newBlockObj;
-            newBlock.OnBeginDrag(eventData);
+            CreateDuplicateForDrag(eventData);
             return;
-
-            
         }
 
-        blockImage.raycastTarget = false;
+        // Non-aktifkan raycast pada gambar agar drop target bisa mendeteksi
+        if (blockImage != null)
+            blockImage.raycastTarget = false;
 
-        // Simpan posisi asli
+        // Simpan posisi dan parent asli
         parentBeforeDrag = transform.parent;
         positionBeforeDrag = rectTransform.anchoredPosition;
 
-        // Pindahkan ke canvas root untuk dragging
+        // Pindahkan ke root canvas agar berada di atas semua elemen
         transform.SetParent(transform.root);
         transform.SetAsLastSibling();
 
-        // Setup visual untuk dragging
+        // Atur visual saat drag
         canvasGroup.blocksRaycasts = false;
-        canvasGroup.alpha = 0.8f; // Sedikit transparan
-
-        // Perbesar sedikit saat dragging
+        canvasGroup.alpha = 0.8f;
         rectTransform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
-
-    }
-
-    void SaveOriginalPosition()
-    {
-        parentBeforeDrag = transform.parent;
-        positionBeforeDrag = rectTransform.anchoredPosition;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        // Update position with mouse
+        // Gerakkan blok mengikuti posisi mouse
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
             (RectTransform)transform.parent,
             eventData.position,
@@ -115,22 +99,52 @@ public class CodeBlock : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // Restore visual
+        // Kembalikan visual ke normal
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
         rectTransform.localScale = Vector3.one;
 
+        // Aktifkan kembali raycast pada image
+        if (blockImage != null)
+            blockImage.raycastTarget = true;
 
-        // Jika tidak di-drop di area valid, kembalikan ke posisi asal
+        // Jika tidak di-drop di area yang valid, kembalikan ke posisi asal
         if (transform.parent == parentBeforeDrag ||
             transform.parent == transform.root ||
             transform.parent == null)
         {
             ReturnToOriginalPosition();
         }
-        blockImage.raycastTarget = true;
     }
 
+    // ============= DUPLIKAT TEMPLATE =============
+    private void CreateDuplicateForDrag(PointerEventData eventData)
+    {
+        // Buat salinan baru dari prefab
+        GameObject newBlockObj = Instantiate(gameObject, transform.position, transform.rotation, transform.parent);
+        CodeBlock newBlock = newBlockObj.GetComponent<CodeBlock>();
+
+        // Set sebagai instance (bukan template)
+        newBlock.isTemplate = false;
+        newBlock.originalTemplate = this;
+
+        // Salin tampilan visual (sprite dan warna)
+        if (blockImage != null)
+        {
+            Image newImage = newBlockObj.GetComponent<Image>();
+            if (newImage != null)
+            {
+                newImage.sprite = blockImage.sprite;
+                newImage.color = blockImage.color;
+            }
+        }
+
+        // Alihkan event drag ke duplikat dan mulai drag untuk duplikat
+        eventData.pointerDrag = newBlockObj;
+        newBlock.OnBeginDrag(eventData);
+    }
+
+    // ============= KEMBALI KE POSISI ASAL =============
     public void ReturnToOriginalPosition()
     {
         if (parentBeforeDrag != null)
@@ -146,13 +160,12 @@ public class CodeBlock : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         }
     }
 
-
-
-
-
+    // ============= METHOD TAMBAHAN =============
+    /// <summary>
+    /// Mengembalikan blok ke panel blok (untuk reset program).
+    /// </summary>
     public void ReturnToBlockPanel()
     {
-        // Kembalikan ke panel blok kode (destroy atau reset)
         if (originalTemplate != null && originalTemplate.transform.parent != null)
         {
             transform.SetParent(originalTemplate.transform.parent);
@@ -161,7 +174,9 @@ public class CodeBlock : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         }
     }
 
-    // Method untuk menghapus blok setelah selesai
+    /// <summary>
+    /// Menghancurkan blok (digunakan saat clear program).
+    /// </summary>
     public void Dispose()
     {
         Destroy(gameObject);
