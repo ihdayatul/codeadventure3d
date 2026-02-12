@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     [Header("Programming")]
     [SerializeField]
     private ProgrammingArea programmingArea;
+    [SerializeField]
+    private FunctionArea functionArea;
 
     [Header("Fail State")]
     public bool isPlayerFallen = false;
@@ -92,4 +94,16 @@ public class GameManager : MonoBehaviour
         programmingArea.DoShowInvalidDropFeedback();
     }
 
+    public void SetSelectedFunction(FunctionBlock functionBlock)
+    {
+        functionArea.SetSelectedFunction(functionBlock);
+    }
+
+    public void ClearFunction()
+    {
+        functionArea.SetActive(false);
+        functionArea.Clear();
+    }
+
+    public bool IsExecutingProgram => programmingArea.IsExecuting;
 }

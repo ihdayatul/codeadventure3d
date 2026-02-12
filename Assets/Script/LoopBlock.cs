@@ -9,10 +9,10 @@ using static CodeBlock;
 public class LoopBlock : MonoBehaviour, IDropHandler
 {
     [Header("UI References")]
-    [SerializeField] private TMP_Text nameText;
     [SerializeField] private Image blockImage;
+    [SerializeField] private Image iconImage;
     [SerializeField] private ContentSizeFitter contentFitter;
-    [SerializeField] private VerticalLayoutGroup layoutGroup; // HARUS Vertical, bukan Horizontal
+    [SerializeField] private HorizontalLayoutGroup layoutGroup; // HARUS Vertical, bukan Horizontal
     [SerializeField] private InputFieldButton repeatInput;
     [SerializeField] private Button addBlockButton;           // Tombol untuk mode tambah blok
     [SerializeField] private Transform commandContainer;      // Tempat blok di dalam loop
@@ -40,21 +40,6 @@ public class LoopBlock : MonoBehaviour, IDropHandler
 
     private void InitializeComponents()
     {
-        // Setup layout group jadi Vertical kalau belum
-        if (layoutGroup == null)
-            layoutGroup = GetComponent<VerticalLayoutGroup>();
-        if (layoutGroup != null)
-        {
-            layoutGroup.padding = new RectOffset(10, 10, 10, 10);
-            layoutGroup.spacing = 5;
-        }
-
-        // Setup content fitter
-        if (contentFitter == null)
-            contentFitter = GetComponent<ContentSizeFitter>();
-        if (contentFitter != null)
-            contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
         // Setup tombol
         if (addBlockButton != null)
             addBlockButton.onClick.AddListener(AllowAddBlock);
@@ -80,14 +65,11 @@ public class LoopBlock : MonoBehaviour, IDropHandler
         if (commandContainer != null) commandContainer.gameObject.SetActive(true);
         if (layoutGroup != null) layoutGroup.enabled = true;
         if (contentFitter != null) contentFitter.enabled = true;
+        iconImage.gameObject.SetActive(false);
 
         // Warna latar
         if (blockImage != null)
             blockImage.color = normalColor;
-
-        // Update teks nama
-        if (nameText != null)
-            nameText.text = $"Ulangi {RepeatCount} kali";
     }
 
     // ============= AKTIFKAN MODE TERIMA BLOK =============
@@ -119,7 +101,7 @@ public class LoopBlock : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         // Hanya bisa drop jika sudah menjadi code block dan dalam mode aktif (warna hijau)
-        if (!isCodeBlock || blockImage == null || blockImage.color != highlightColor)
+        if (!isCodeBlock)
             return;
 
         GameObject dropped = eventData.pointerDrag;
@@ -238,13 +220,6 @@ public class LoopBlock : MonoBehaviour, IDropHandler
                 Destroy(block.gameObject);
         }
         codeBlocks.Clear();
-    }
-
-    // Update teks nama saat RepeatCount berubah
-    public void UpdateDisplay()
-    {
-        if (nameText != null && isCodeBlock)
-            nameText.text = $"Ulangi {RepeatCount} kali";
     }
 
     private void OnDestroy()

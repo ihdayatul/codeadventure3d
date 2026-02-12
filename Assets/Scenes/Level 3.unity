@@ -517,8 +517,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0bede86cb628fa4bb7e54ffc23dd6a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoopBlock
-  nameText: {fileID: 0}
   blockImage: {fileID: 50823821}
+  iconImage: {fileID: 0}
   contentFitter: {fileID: 50823822}
   layoutGroup: {fileID: 0}
   repeatInput: {fileID: 1036329711}
@@ -2684,6 +2684,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1569383591851755907, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1530849914}
+    - targetCorrespondingSourceObject: {fileID: 1569383591851755907, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1530849922}
   m_SourcePrefab: {fileID: 100100000, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
 --- !u!1 &372962984
 GameObject:
@@ -4502,8 +4505,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0bede86cb628fa4bb7e54ffc23dd6a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoopBlock
-  nameText: {fileID: 0}
   blockImage: {fileID: 674629191}
+  iconImage: {fileID: 0}
   contentFitter: {fileID: 674629192}
   layoutGroup: {fileID: 0}
   repeatInput: {fileID: 1562526942}
@@ -10280,7 +10283,7 @@ MonoBehaviour:
   m_ChildAlignment: 3
   m_Spacing: 10
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 1
@@ -10298,10 +10301,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0bede86cb628fa4bb7e54ffc23dd6a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoopBlock
-  nameText: {fileID: 0}
   blockImage: {fileID: 1530849919}
+  iconImage: {fileID: 1258144684}
   contentFitter: {fileID: 1530849914}
-  layoutGroup: {fileID: 0}
+  layoutGroup: {fileID: 1530849915}
   repeatInput: {fileID: 1113123023}
   addBlockButton: {fileID: 1530849918}
   commandContainer: {fileID: 1530849913}
@@ -10332,6 +10335,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!114 &1530849922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1530849912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: 200
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &1540678530
 GameObject:
   m_ObjectHideFlags: 0
@@ -13335,6 +13358,7 @@ MonoBehaviour:
   CompleteLevelUI: {fileID: 1709705140}
   RestartBatton: {fileID: 1085141892}
   programmingArea: {fileID: 1309223615}
+  functionArea: {fileID: 0}
   isPlayerFallen: 0
 --- !u!1 &2045253098
 GameObject:

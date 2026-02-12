@@ -965,55 +965,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 1.9999998, z: 1.9999996}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &195721989
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 195721990}
-  - component: {fileID: 195721991}
-  m_Layer: 5
-  m_Name: FunctionManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &195721990
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 195721989}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1572623039}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &195721991
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 195721989}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02ac06717ecd3854ab2eecf840095d49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  definedFunctions: []
 --- !u!1 &227989549
 GameObject:
   m_ObjectHideFlags: 0
@@ -3498,7 +3449,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: d1c55763192d61440904063660e68dcd, type: 3}
     - target: {fileID: 7265833767113132992, guid: 3e90940e307754642b9b3177f26161f0, type: 3}
       propertyPath: blockType
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7265833767113132992, guid: 3e90940e307754642b9b3177f26161f0, type: 3}
       propertyPath: isTemplate
@@ -4455,6 +4406,10 @@ PrefabInstance:
       value: 0.19529362
       objectReference: {fileID: 0}
     - target: {fileID: 7265833767113132992, guid: f6a5d4514afe7614d9a386f87c8be5d7, type: 3}
+      propertyPath: blockType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7265833767113132992, guid: f6a5d4514afe7614d9a386f87c8be5d7, type: 3}
       propertyPath: isTemplate
       value: 1
       objectReference: {fileID: 0}
@@ -5297,20 +5252,15 @@ MonoBehaviour:
   nameText: {fileID: 0}
   blockImage: {fileID: 1412299588}
   contentFitter: {fileID: 1412299590}
-  layoutGroup: {fileID: 1412299584}
+  layoutGroup: {fileID: 0}
   repeatInput: {fileID: 1861461804}
-  button: {fileID: 1412299587}
---- !u!114 &1412299587 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 821141394273410547, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
-  m_PrefabInstance: {fileID: 1758091266}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1412299582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  addBlockButton: {fileID: 0}
+  commandContainer: {fileID: 0}
+  normalColor: {r: 0.8, g: 0.4, b: 1, a: 1}
+  highlightColor: {r: 0, g: 1, b: 0, a: 1}
+  maxBlocksInLoop: 5
+  isTemplate: 0
+  isCodeBlock: 0
 --- !u!114 &1412299588 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6331488496539459389, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
@@ -5336,6 +5286,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 1
   m_VerticalFit: 0
+--- !u!114 &1412299591 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7265833767113132992, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
+  m_PrefabInstance: {fileID: 1758091266}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412299582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b5fd729bbbc5484f95eb4ad197751ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CodeBlock
 --- !u!1 &1463111185
 GameObject:
   m_ObjectHideFlags: 0
@@ -5348,7 +5309,6 @@ GameObject:
   - component: {fileID: 1463111190}
   - component: {fileID: 1463111189}
   - component: {fileID: 1463111188}
-  - component: {fileID: 1463111187}
   m_Layer: 5
   m_Name: FunctionDefinitionArea
   m_TagString: Untagged
@@ -5372,23 +5332,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -40}
+  m_SizeDelta: {x: 0, y: -80}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1463111187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1463111185}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!114 &1463111188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5406,10 +5352,10 @@ MonoBehaviour:
     m_Right: 10
     m_Top: 10
     m_Bottom: 10
-  m_ChildAlignment: 0
+  m_ChildAlignment: 1
   m_Spacing: 10
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -5661,6 +5607,10 @@ PrefabInstance:
     - target: {fileID: 6331488496539459389, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
       propertyPath: m_Color.r
       value: 0.33428586
+      objectReference: {fileID: 0}
+    - target: {fileID: 7265833767113132992, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
+      propertyPath: blockType
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7265833767113132992, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
       propertyPath: isTemplate
@@ -5936,7 +5886,6 @@ RectTransform:
   - {fileID: 1991182554}
   - {fileID: 689445525}
   - {fileID: 1020783522}
-  - {fileID: 195721990}
   m_Father: {fileID: 1040460770}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -6790,14 +6739,14 @@ GameObject:
   - component: {fileID: 1700177502}
   - component: {fileID: 1700177505}
   - component: {fileID: 1700177504}
-  - component: {fileID: 1700177503}
+  - component: {fileID: 1700177506}
   m_Layer: 5
   m_Name: FunctionPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1700177502
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6819,27 +6768,6 @@ RectTransform:
   m_AnchoredPosition: {x: 50, y: 50}
   m_SizeDelta: {x: 250, y: 600}
   m_Pivot: {x: 0, y: 0.5}
---- !u!114 &1700177503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700177501}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 187e590c37090484da976458466eacdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProgrammingArea
-  robot: {fileID: 254777320}
-  codeBlocksPanel: {fileID: 1572623039}
-  codeBlockContainer: {fileID: 0}
-  codeBlocks: []
-  maxBlocks: 9
-  validDropColor: {r: 0, g: 1, b: 0, a: 0.3}
-  invalidDropColor: {r: 1, g: 0, b: 0, a: 0.3}
-  runButton: {fileID: 768550216}
-  restartButton: {fileID: 1085141894}
 --- !u!114 &1700177504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6878,6 +6806,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700177501}
   m_CullTransparentMesh: 1
+--- !u!114 &1700177506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700177501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 208683bcbb9a44545be367a0645eecd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FunctionArea
+  maxBlocks: 5
+  commandContainer: {fileID: 1463111186}
+  loopBlock: {fileID: 1412299591}
+  areaImage: {fileID: 1700177504}
+  validDropColor: {r: 0, g: 1, b: 0, a: 0.3}
+  invalidDropColor: {r: 1, g: 0, b: 0, a: 0.3}
 --- !u!1001 &1704818876
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7149,7 +7095,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7265833767113132992, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
       propertyPath: blockType
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7265833767113132992, guid: 8ce5eef0e20793545b5348c0fa7d2a8c, type: 3}
       propertyPath: isTemplate
@@ -8315,6 +8261,7 @@ MonoBehaviour:
   CompleteLevelUI: {fileID: 1709705140}
   RestartBatton: {fileID: 1085141892}
   programmingArea: {fileID: 1309223615}
+  functionArea: {fileID: 1700177506}
   isPlayerFallen: 0
 --- !u!1 &2053345745
 GameObject:

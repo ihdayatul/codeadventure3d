@@ -103,6 +103,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -149,6 +150,7 @@ GameObject:
   - component: {fileID: 6331488496539459389}
   - component: {fileID: 821141394273410547}
   - component: {fileID: 7265833767113132992}
+  - component: {fileID: 5641875370852769289}
   m_Layer: 5
   m_Name: Block_FunctionDefinition
   m_TagString: Untagged
@@ -270,6 +272,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b5fd729bbbc5484f95eb4ad197751ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CodeBlock
-  blockType: rotate_right
+  blockType: 0
   displayText: Putar Kanan
-  originalParent: {fileID: 0}
+  originalTemplate: {fileID: 0}
+  isTemplate: 0
+--- !u!114 &5641875370852769289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569383591851755907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54c53f77150a0ad44bdc651bd691ae15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FunctionBlock
+  button: {fileID: 821141394273410547}

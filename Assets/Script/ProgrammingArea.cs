@@ -28,6 +28,8 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
     private bool isExecuting = false;
     private Image areaImage;
 
+    public bool IsExecuting => isExecuting;
+
     // ============= PROPERTIES =============
     public int BlocksCount
     {
@@ -98,31 +100,40 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
         rt.localScale = Vector3.one;
 
         // ============ HANDLE JENIS BLOK KHUSUS ============
-
-        // --- BLOK DEFINISI FUNGSI ---
         if (codeBlock.blockType == BlockType.FunctionDefinition)
         {
-            FunctionDefinitionBlock funcDef = codeBlock.GetComponent<FunctionDefinitionBlock>();
-            if (funcDef != null)
-            {
-                funcDef.isTemplate = false;
-                // Daftarkan ke FunctionManager
-                if (FunctionManager.Instance != null)
-                    FunctionManager.Instance.RegisterFunction(funcDef);
-                Debug.Log($"📦 Fungsi '{funcDef.functionName}' ditambahkan ke program.");
-            }
+            var funcDef = codeBlock.GetComponent<FunctionBlock>();
+            funcDef.SetAsCodeBlock();
         }
-        // --- BLOK PANGGIL FUNGSI ---
-        else if (codeBlock.blockType == BlockType.FunctionCall)
+        if (codeBlock.blockType == BlockType.Loop)
         {
-            FunctionCallBlock funcCall = codeBlock.GetComponent<FunctionCallBlock>();
-            if (funcCall != null)
-            {
-                funcCall.isTemplate = false;
-                // Refresh dropdown setelah 1 frame (agar FunctionManager siap)
-                StartCoroutine(DelayedRefreshDropdown(funcCall));
-            }
+            var loopBlock = codeBlock.GetComponent<LoopBlock>();
+            loopBlock.SetAsCodeBlock();
         }
+        //// --- BLOK DEFINISI FUNGSI ---
+        //if (codeBlock.blockType == BlockType.FunctionDefinition)
+        //{
+        //    FunctionDefinitionBlock funcDef = codeBlock.GetComponent<FunctionDefinitionBlock>();
+        //    if (funcDef != null)
+        //    {
+        //        funcDef.isTemplate = false;
+        //        // Daftarkan ke FunctionManager
+        //        if (FunctionManager.Instance != null)
+        //            FunctionManager.Instance.RegisterFunction(funcDef);
+        //        Debug.Log($"📦 Fungsi '{funcDef.functionName}' ditambahkan ke program.");
+        //    }
+        //}
+        //// --- BLOK PANGGIL FUNGSI ---
+        //else if (codeBlock.blockType == BlockType.FunctionCall)
+        //{
+        //    FunctionCallBlock funcCall = codeBlock.GetComponent<FunctionCallBlock>();
+        //    if (funcCall != null)
+        //    {
+        //        funcCall.isTemplate = false;
+        //        // Refresh dropdown setelah 1 frame (agar FunctionManager siap)
+        //        StartCoroutine(DelayedRefreshDropdown(funcCall));
+        //    }
+        //}
 
         // Update UI
         runButton.enabled = codeBlocks.Count > 0;
@@ -221,18 +232,27 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
                 }
                 break;
 
-            case BlockType.FunctionCall:
-                // ✅ EKSEKUSI PANGGIL FUNGSI
-                FunctionCallBlock call = block.GetComponent<FunctionCallBlock>();
-                if (call != null)
-                    yield return call.Execute(robot);
-                else
-                    Debug.LogWarning("FunctionCallBlock tidak ditemukan.");
-                break;
+            //case BlockType.FunctionCall:
+            //    // ✅ EKSEKUSI PANGGIL FUNGSI
+            //    FunctionCallBlock call = block.GetComponent<FunctionCallBlock>();
+            //    if (call != null)
+            //        yield return call.Execute(robot);
+            //    else
+            //        Debug.LogWarning("FunctionCallBlock tidak ditemukan.");
+            //    break;
 
             // FunctionDefinition tidak dieksekusi
             case BlockType.FunctionDefinition:
-                Debug.Log("ℹ️ Blok definisi fungsi diabaikan saat eksekusi.");
+                var funcDef = block.GetComponent<FunctionBlock>();
+                foreach (var cmd in funcDef.CodeBlocks)
+                {
+                    yield return StartCoroutine(ExecuteBlockCommandCoroutine(cmd));
+                    if (GameManager.instance.isPlayerFallen)
+                    {
+                        Debug.Log("⛔ Eksekusi dihentikan: Player jatuh");
+                        yield break;
+                    }
+                }
                 break;
         }
     }
@@ -268,11 +288,12 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
             // 🔥 Hapus fungsi dari FunctionManager jika blok definisi fungsi
             if (block.blockType == BlockType.FunctionDefinition)
             {
-                FunctionDefinitionBlock funcDef = block.GetComponent<FunctionDefinitionBlock>();
-                if (funcDef != null && !funcDef.isTemplate && FunctionManager.Instance != null)
+                FunctionBlock funcDef = block.GetComponent<FunctionBlock>();
+                if (funcDef != null)
                 {
-                    FunctionManager.Instance.UnregisterFunction(funcDef);
+                    funcDef.Clear();  // Bersihkan isi fungsi
                 }
+                GameManager.instance.ClearFunction();
             }
 
             if (!block.isTemplate && block.originalTemplate != null)
