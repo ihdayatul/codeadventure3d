@@ -70,4 +70,6 @@ public class FunctionManager : MonoBehaviour
     {
         definedFunctions.Clear();
     }
+
+    
 }

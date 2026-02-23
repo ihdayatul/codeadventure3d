@@ -16,7 +16,7 @@ public class GoalTrigger : MonoBehaviour
         {
             audioManager.PlaySFX(audioManager.checkpoint);
             GameManager.instance.isPlayerAtGoal = true;
-            //UnlockNewLevel();
+            UnlockNewLevel();
         }
     }
 

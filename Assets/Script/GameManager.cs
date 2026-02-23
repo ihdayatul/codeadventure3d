@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
 
     public void RefreshList()
     {
-        programmingArea.RefreshLayout(); // ✅ nama baru
+        programmingArea.RefreshList(); // ✅ nama baru
     }
 
     public void ShowValidDropFeedback()
@@ -106,4 +106,6 @@ public class GameManager : MonoBehaviour
     }
 
     public bool IsExecutingProgram => programmingArea.IsExecuting;
+
+    
 }

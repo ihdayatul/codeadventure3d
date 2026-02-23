@@ -137,7 +137,7 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
 
         // Update UI
         runButton.enabled = codeBlocks.Count > 0;
-        RefreshLayout();
+        RefreshList();
         StartCoroutine(ShowValidDropFeedback());
 
         Debug.Log($"✅ Blok {codeBlock.blockType} ditambahkan. Total: {codeBlocks.Count}");
@@ -152,7 +152,7 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
     }
 
     // ============= REFRESH LAYOUT =============
-    public void RefreshLayout()
+    public void RefreshList()
     {
         LayoutRebuilder.ForceRebuildLayoutImmediate(codeBlockContainer);
     }
@@ -367,5 +367,70 @@ public class ProgrammingArea : MonoBehaviour, IDropHandler
     {
         // Tidak diperlukan untuk fungsionalitas utama, bisa dihapus atau dikosongkan
         // Jika ingin memastikan blok yang di-drag tetap tercatat, bisa diabaikan.
+    }
+
+    public void RemoveBlock(CodeBlock block)
+    {
+        if (codeBlocks.Contains(block))
+        {
+            codeBlocks.Remove(block);
+
+            // ============ JIKA BLOK ADALAH DEFINISI FUNGSI ============
+            if (block.blockType == BlockType.FunctionDefinition)
+            {
+                FunctionDefinitionBlock funcDef = block.GetComponent<FunctionDefinitionBlock>();
+                if (funcDef != null && !funcDef.isTemplate && FunctionManager.Instance != null)
+                {
+                    FunctionManager.Instance.UnregisterFunction(funcDef);
+                    Debug.Log($"📦 Fungsi '{funcDef.functionName}' dihapus dari FunctionManager");
+                }
+            }
+
+            // ============ JIKA BLOK ADALAH LOOP ============
+            if (block.blockType == BlockType.Loop)
+            {
+                LoopBlock loop = block.GetComponent<LoopBlock>();
+                if (loop != null)
+                {
+                    loop.ClearLoop(); // Hapus semua blok di dalam loop
+                }
+            }
+
+            // Update UI
+            runButton.enabled = codeBlocks.Count > 0;
+            RefreshList();
+
+            Debug.Log($"✅ Blok dihapus dari programming area. Sisa: {codeBlocks.Count}");
+        }
+        else
+        {
+            // Mungkin blok berada di dalam container (loop/fungsi)
+            // Coba cari parent container dan hapus dari sana
+            TryRemoveFromContainer(block);
+        }
+    }
+
+    /// <summary>
+    /// Mencoba menghapus blok dari container (LoopBlock / FunctionDefinitionBlock)
+    /// </summary>
+    private void TryRemoveFromContainer(CodeBlock block)
+    {
+        // Cek apakah blok berada di dalam LoopBlock
+        LoopBlock parentLoop = block.GetComponentInParent<LoopBlock>();
+        if (parentLoop != null)
+        {
+            parentLoop.RemoveBlock(block);
+            Debug.Log($"🔄 Blok dihapus dari dalam loop");
+            return;
+        }
+
+        // Cek apakah blok berada di dalam FunctionDefinitionBlock
+        FunctionDefinitionBlock parentFunc = block.GetComponentInParent<FunctionDefinitionBlock>();
+        if (parentFunc != null)
+        {
+            parentFunc.RemoveCommand(block);
+            Debug.Log($"📦 Blok dihapus dari dalam fungsi {parentFunc.functionName}");
+            return;
+        }
     }
 }

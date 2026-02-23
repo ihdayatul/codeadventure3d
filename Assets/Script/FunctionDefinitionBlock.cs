@@ -133,6 +133,7 @@ public class FunctionDefinitionBlock : MonoBehaviour, IDropHandler
         if (commandList.Contains(block))
         {
             commandList.Remove(block);
+            Destroy(block.gameObject);
         }
     }
 
@@ -237,4 +238,5 @@ public class FunctionDefinitionBlock : MonoBehaviour, IDropHandler
             FunctionManager.Instance.UnregisterFunction(this);
         }
     }
+     
 }
